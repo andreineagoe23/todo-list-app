@@ -7,7 +7,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>To-Do List</h1>
-        <TodoList /> {/* Render your TodoList component */}
+        <ToDoList /> {/* Render your TodoList component */}
       </header>
     </div>
   );
