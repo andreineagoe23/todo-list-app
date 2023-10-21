@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './ToDoList.css';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function ToDoList() {
   const [tasks, setTasks] = useState([]);
@@ -24,6 +25,18 @@ function ToDoList() {
     setTasks(updatedTasks);
   };
 
+  const onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const reorderedTasks = [...tasks];
+    const [removed] = reorderedTasks.splice(result.source.index, 1);
+    reorderedTasks.splice(result.destination.index, 0, removed);
+
+    setTasks(reorderedTasks);
+  };
+
   return (
     <div className="todo-list">
       <h1>To-Do List</h1>
@@ -36,16 +49,32 @@ function ToDoList() {
         />
         <button onClick={addTask}>Add</button>
       </div>
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={index} className={task.completed ? 'completed' : ''}>
-            <span onClick={() => toggleTask(index)}>{task.text}</span>
-            <button onClick={() => removeTask(index)}>Remove</button>
-          </li>
-        ))}
-      </ul>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="tasks">
+          {(provided) => (
+            <ul {...provided.droppableProps} ref={provided.innerRef}>
+              {tasks.map((task, index) => (
+                <Draggable key={index} draggableId={index.toString()} index={index}>
+                  {(provided) => (
+                    <li
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      key={index}
+                      className={task.completed ? 'completed' : ''}
+                    >
+                      <span onClick={() => toggleTask(index)}>{task.text}</span>
+                      <button onClick={() => removeTask(index)}>Remove</button>
+                    </li>
+                  )}
+                </Draggable>
+              ))}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 }
 
-export default ToDoList;
+export default TodoList;
